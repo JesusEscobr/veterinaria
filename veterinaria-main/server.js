@@ -21,14 +21,13 @@ app.use("/veterinarios", vetsRoutes);
 app.use("/mascotas", mascotasRoutes);
 app.use("/citas", citasRoutes);
 
-const PORT = process.env.PORT || 3000;
 
 // conexion a Mongo:
 mongoose.connect(process.env.MONGO_URI)
    .then(() => console.log("Conectado a MongoDB"))
     .catch((err) => console.log("Error al conectar a MongoDB", err))
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`)
+app.listen(process.env.PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${process.env.PORT}`)
 })
 
