@@ -40,7 +40,7 @@ router.put("/:id", async (req, res) => {
 
         if (row.length === 0) {
             await conn.rollback();
-            return res.status(404).json({ error: "mascota no encontrada" });
+            return res.status(404).json({ error: "Mascota no encontrada" });
         }
 
         await conn.query("SELECT SLEEP(15)");
@@ -53,12 +53,12 @@ router.put("/:id", async (req, res) => {
         );
 
         await conn.commit();
-        res.json({ message: "mascota actualizada" });
+        res.json({ message: "Mascota actualizada" });
 
     } catch (error) {
         await conn.rollback();
         console.error(error);
-        res.status(500).json({ error: "error al actualizar mascota" });
+        res.status(500).json({ error: "Error al actualizar mascota" });
     } finally {
         conn.release();
     }

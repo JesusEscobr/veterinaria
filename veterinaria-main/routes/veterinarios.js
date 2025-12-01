@@ -35,7 +35,7 @@ router.put("/:id", async (req, res) => {
 
         if (row.length === 0) {
             await conn.rollback();
-            return res.status(404).json({ error: "veterinario no encontrado" });
+            return res.status(404).json({ error: "Veterinario no encontrado" });
         }
 
         await conn.query(
@@ -44,7 +44,7 @@ router.put("/:id", async (req, res) => {
         );
 
         await conn.commit();
-        res.json({ message: "veterinario actualizado" });
+        res.json({ message: "Veterinario actualizado" });
 
     } catch (err) {
         await conn.rollback();

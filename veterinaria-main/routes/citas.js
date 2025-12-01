@@ -52,11 +52,11 @@ router.put("/:id", async (req, res) => {
         );
 
         await conn.commit();
-        res.json({ message: "cita actualizada" });
+        res.json({ message: "Cita actualizada" });
 
     } catch (err) {
         await conn.rollback();
-        res.status(500).json({ error: "error al actualizar cita" });
+        res.status(500).json({ error: "Error al actualizar cita" });
     } finally {
         conn.release();
     }
