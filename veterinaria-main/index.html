@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes de mascotitas</title>
+</head>
+<body>
+
+<h1>- Reportes de mascotitas -</h1>
+
+<button onclick="cargarReportes()">Cargar todos los reportes</button>
+<pre id="lista"></pre>
+
+<hr>
+
+<h2>Crear reporte</h2>
+<input id="id_vet" placeholder="ID Veterinario">
+<input id="id_dueno" placeholder="ID Dueño">
+<input id="id_mascota" placeholder="ID Mascota">
+<input id="diag" placeholder="Diagnóstico">
+<input id="meds" placeholder="Medicamentos">
+<input id="recom" placeholder="Recomendaciones">
+<button onclick="crearReporte()">Crear</button>
+
+<hr>
+
+<h2>Buscar reportes por ID</h2>
+
+<h3>Por dueño</h3>
+<input id="id_due" placeholder="ID dueño">
+<button onclick="buscarPorDueno()">Buscar</button>
+
+<h3>Por veterinario</h3>
+<input id="id_vete" placeholder="ID veterinario">
+<button onclick="buscarPorVet()">Buscar</button>
+
+<h3>Por mascota</h3>
+<input id="id_mas" placeholder="ID mascota">
+<button onclick="buscarPorMascota()">Buscar</button>
+
+<hr>
+
+<h2>Editar reporte</h2>
+<input id="edit_id" placeholder="ID del reporte a editar">
+<input id="edit_diagnostico" placeholder="Nuevo diagnóstico">
+<input id="edit_medicamentos" placeholder="Nuevos medicamentos">
+<input id="edit_recomendaciones" placeholder="Nuevas recomendaciones">
+<button onclick="editarReporte()">Actualizar</button>
+
+<script>
+    const BASE = "http://localhost:5000/api/reportes";
+
+    function cargarReportes() {
+        fetch(`${BASE}/`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("lista").textContent = JSON.stringify(data, null, 2);
+            });
+    }
+
+    // para crear el reporte
+    function crearReporte() {
+        
+        const body = {
+            id_veterinario: document.getElementById("id_vet").value,
+            id_dueno: document.getElementById("id_dueno").value,
+            id_mascota: document.getElementById("id_mascota").value,
+            diagnostico: document.getElementById("diag").value,
+            medicamentos: document.getElementById("meds").value,
+            recomendaciones: document.getElementById("recom").value
+        };
+
+        fetch(`${BASE}/crear`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("Reporte creado con éxito :D");
+            cargarReportes();
+        })
+        .catch(e => console.error(e));
+    }
+
+    // buscar por id del dueño
+    function buscarPorDueno() {
+        const id = document.getElementById("id_due").value;
+        fetch(`${BASE}/dueno/${id}`)
+            .then(res => res.json())
+            .then(data => document.getElementById("lista").textContent = JSON.stringify(data, null, 2));
+    }
+
+    // buscar por id del veterinario
+    function buscarPorVet() {
+        const id = document.getElementById("id_vete").value;
+        fetch(`${BASE}/vet/${id}`)
+            .then(res => res.json())
+            .then(data => document.getElementById("lista").textContent = JSON.stringify(data, null, 2));
+    }
+
+    // buscar por id de la mascotita
+    function buscarPorMascota() {
+        const id = document.getElementById("id_mas").value;
+        fetch(`${BASE}/mascota/${id}`)
+            .then(res => res.json())
+            .then(data => document.getElementById("lista").textContent = JSON.stringify(data, null, 2));
+    }
+
+    // actualizar los reportes
+    function editarReporte() {
+        const id = document.getElementById("edit_id").value;
+
+        const body = {
+            diagnostico: document.getElementById("edit_diagnostico").value,
+            medicamentos: document.getElementById("edit_medicamentos").value,
+            recomendaciones: document.getElementById("edit_recomendaciones").value
+        };
+
+        fetch(`${BASE}/${id}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("El reporte se actualizó exitosamente :D");
+            cargarReportes();
+        });
+    }
+</script>
+
+</body>
+</html>

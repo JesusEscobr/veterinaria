@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Simple Veterinaria</title>
+</head>
+<body>
+
+<h2>Agregar Dueño</h2>
+<form onsubmit="crearDueno(event)">
+    <input id="d_nombre" placeholder="Nombre"><br>
+    <input id="d_tel" placeholder="Telefono" type="number"><br>
+    <input id="d_email" placeholder="Email"><br>
+    <button type="submit">Guardar</button>
+</form>
+<p id="msg_dueno"></p>
+
+
+<h2>Agregar Veterinario</h2>
+<form onsubmit="crearVet(event)">
+    <input id="v_nombre" placeholder="Nombre"><br>
+    <input id="v_esp" placeholder="Especialidad"><br>
+    <button type="submit">Guardar</button>
+</form>
+<p id="msg_vet"></p>
+
+
+<h2>Agregar Mascota</h2>
+<form onsubmit="crearMascota(event)">
+    <input id="m_nombre" placeholder="Nombre"><br>
+    <input id="m_tipo" placeholder="Tipo"><br>
+    <input id="m_edad" placeholder="Edad" type="number"><br>
+    <input id="m_peso" placeholder="Peso" type="number" step="0.1"><br>
+    <input id="m_dueno" placeholder="ID Dueño" type="number"><br>
+    <button type="submit">Guardar</button>
+</form>
+<p id="msg_masc"></p>
+
+
+<h2>Agregar Cita</h2>
+<form onsubmit="crearCita(event)">
+    <input id="c_fecha" type="date"><br>
+    <input id="c_hora" type="time"><br>
+    <input id="c_dueno" placeholder="ID Dueño" type="number"><br>
+    <input id="c_vet" placeholder="ID Veterinario" type="number"><br>
+    <button type="submit">Guardar</button>
+</form>
+<p id="msg_cita"></p>
+
+
+<script>
+const API = "http://localhost:3000";
+
+// DUENO
+async function crearDueno(e){
+    e.preventDefault();
+    const body = {
+        nombre: document.getElementById("d_nombre").value,
+        telefono_dueno: Number(document.getElementById("d_tel").value),
+        email: document.getElementById("d_email").value
+    };
+    enviar("/duenos", body, "msg_dueno");
+}
+
+// VET
+async function crearVet(e){
+    e.preventDefault();
+    const body = {
+        nombre: document.getElementById("v_nombre").value,
+        especialidad: document.getElementById("v_esp").value
+    };
+    enviar("/veterinarios", body, "msg_vet");
+}
+
+// MASCOTA
+async function crearMascota(e){
+    e.preventDefault();
+    const body = {
+        nombre: document.getElementById("m_nombre").value,
+        tipo: document.getElementById("m_tipo").value,
+        edad: Number(document.getElementById("m_edad").value),
+        peso: Number(document.getElementById("m_peso").value),
+        id_dueno: Number(document.getElementById("m_dueno").value)
+    };
+    enviar("/mascotas", body, "msg_masc");
+}
+
+// CITA
+async function crearCita(e){
+    e.preventDefault();
+    const body = {
+        fecha: document.getElementById("c_fecha").value,
+        hora: document.getElementById("c_hora").value,
+        id_dueno: Number(document.getElementById("c_dueno").value),
+        id_veterinario: Number(document.getElementById("c_vet").value)
+    };
+    enviar("/citas", body, "msg_cita");
+}
+
+
+// FUNCION GENERAL PARA ENVIAR
+async function enviar(endpoint, body, msgElement){
+    try {
+        const res = await fetch(API + endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        document.getElementById(msgElement).textContent =
+            res.ok ? "Guardado. ID: " + data.id : "Error: " + JSON.stringify(data);
+    } catch (err) {
+        document.getElementById(msgElement).textContent = "Error: " + err.message;
+    }
+}
+</script>
+
+</body>
+</html>
