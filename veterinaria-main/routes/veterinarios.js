@@ -21,16 +21,39 @@ router.post("/", async (req, res) => {
 
 // actualizar veterinarios
 router.put("/:id", async (req, res) => {
-    const { id } = req.params;
-    const { nombre, especialidad } = req.body;
+    const conn = await pool.getConnection();
+    try {
+        const { id } = req.params;
+        const { nombre, especialidad } = req.body;
 
-    await pool.query(
-        "UPDATE veterinarios SET nombre=?, especialidad=? WHERE id_veterinario=?",
-        [nombre, especialidad, id]
-    )
+        await conn.beginTransaction();
 
-    res.json({ message: "Veterinario actualizado" })
-})
+        const [row] = await conn.query(
+            "SELECT * FROM veterinarios WHERE id_veterinario = ? FOR UPDATE",
+            [id]
+        );
+
+        if (row.length === 0) {
+            await conn.rollback();
+            return res.status(404).json({ error: "veterinario no encontrado" });
+        }
+
+        await conn.query(
+            "UPDATE veterinarios SET nombre=?, especialidad=? WHERE id_veterinario=?",
+            [nombre, especialidad, id]
+        );
+
+        await conn.commit();
+        res.json({ message: "veterinario actualizado" });
+
+    } catch (err) {
+        await conn.rollback();
+        res.status(500).json({ error: "error al actualizar" });
+    } finally {
+        conn.release();
+    }
+});
+
 
 
 module.exports = router

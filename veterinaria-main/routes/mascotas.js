@@ -26,18 +26,44 @@ router.post("/", async (req, res) => {
 
 // actualizar mascotas
 router.put("/:id", async (req, res) => {
-    const { id } = req.params;
-    const { nombre, tipo, edad, peso, id_dueno } = req.body;
+    const conn = await pool.getConnection();
+    try {
+        const { id } = req.params;
+        const { nombre, tipo, edad, peso, id_dueno } = req.body;
 
-    await pool.query(
-        `UPDATE mascotas
-         SET nombre=?, tipo=?, edad=?, peso=?, id_dueno=?
-         WHERE id_mascota=?`,
-        [nombre, tipo, edad, peso, id_dueno, id]
-    )
+        await conn.beginTransaction();
 
-    res.json({ message: "Mascota actualizada" })
-})
+        const [row] = await conn.query(
+            "SELECT * FROM mascotas WHERE id_mascota = ? FOR UPDATE",
+            [id]
+        );
+
+        if (row.length === 0) {
+            await conn.rollback();
+            return res.status(404).json({ error: "mascota no encontrada" });
+        }
+
+        await conn.query("SELECT SLEEP(15)");
+
+        await conn.query(
+            `UPDATE mascotas 
+             SET nombre=?, tipo=?, edad=?, peso=?, id_dueno=?
+             WHERE id_mascota=?`,
+            [nombre, tipo, edad, peso, id_dueno, id]
+        );
+
+        await conn.commit();
+        res.json({ message: "mascota actualizada" });
+
+    } catch (error) {
+        await conn.rollback();
+        console.error(error);
+        res.status(500).json({ error: "error al actualizar mascota" });
+    } finally {
+        conn.release();
+    }
+});
+
 
 
 module.exports = router
